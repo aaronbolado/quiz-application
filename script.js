@@ -1,15 +1,29 @@
-const NUM_OF_QUESTIONS = 5;
+const QUESTIONS_PER_TOPIC = 5;
+
 let chosenTopic = null;
 let chosenAnswer = null;
-let questionIndex = 0;
-let appState = 0;
 
-const scores = {
+let topicStartingIndex = 0;
+let questionsAsked = 0;
+let nextQuestionIndex = 0;
+
+let appState = 0;
+let scoreCount = 0;
+
+let scores = {
     PPC: 0,
     AYATP: 0,
     PMC: 0,
     KB: 0
 };
+
+//! Next Submit
+//! Back button 
+//! Confirmation before submitting 
+//! Results. Red sa mga wrong answers
+//! Implement randomize
+
+
 
 const questions = [
     // Philippine Pop Culture
@@ -166,18 +180,78 @@ const questions = [
     }
 ]
 
-// 
+
+document.addEventListener("DOMContentLoaded", updateScores);
+
+// DISPLAY SCORE ON MENU
+function updateScores() {
+    document.querySelectorAll(".score").forEach( score => {
+        let topic = score.getAttribute("data-topic");
+        console.log(topic);
+        score.innerHTML = scores[topic] + "/" + QUESTIONS_PER_TOPIC;
+    });
+}
+
+// RESET CHOICE HIGHLIGHT
+function resetHighlight() {
+    document.querySelectorAll(".choices").forEach(choice => {
+        choice.style.backgroundColor = ""; // Reset
+    });
+}
+
+// CUSTOM SELECTOR FOR MULTIPLE CHOICE QUESTION
 document.querySelectorAll(".choices").forEach( button => {
     button.addEventListener("click", () => {
         chosenAnswer = button.getAttribute("value").toString();
+        
+        resetHighlight();
+
+        button.style.backgroundColor = "green";
         console.log(chosenAnswer);
     });
+});
+
+// RESTART QUIZ FOR CURRENT TOPIC 
+document.getElementById("restart").addEventListener("click", () => {
+    appState = 1; // go to quiz state
+    questionsAsked = 0;
+    nextQuestionIndex = 0;
+    topicStartingIndex = 0;
+    
+    //? Set score na rin ba dito or reset to 0 lang
+    // setScore();
+
+    changeDivContent();
+});
+
+// RETURN TO MENU
+document.getElementById("return-menu").addEventListener("click", () => {
+    appState = 0; // go to menu state
+
+    questionsAsked = 0;
+    nextQuestionIndex = 0;
+    topicStartingIndex = 0;
+    
+    //? Set score na rin ba dito or reset to 0 lang
+    // setScore();
+
+    updateScores();
+
+    console.log(scores);
+
+    scoreCount = 0;
+    changeDivContent();
 });
 
 // CHOSEN TOPIC
 function setChosenTopic (button) {
     chosenTopic = button.getAttribute("data-topic");
     console.log(chosenTopic);
+    
+    // Returns index for the first occurrence of the topic id
+    topicStartingIndex = questions.findIndex(question => question.topic_id == chosenTopic);
+    console.log(topicStartingIndex);
+    
     appState = 1; // go to quiz state
     changeDivContent();
 }
@@ -191,7 +265,6 @@ function changeDivDisplay (state) {
     document.getElementById(state).style.display = "block";
 }
 
-
 // CHANGE DIV CONTENT (states)
 function changeDivContent () {
 
@@ -202,10 +275,23 @@ function changeDivContent () {
         
         case 1: // QUIZ/QUESTIONS
             changeDivDisplay("quiz");   
+
+            if (questionsAsked < QUESTIONS_PER_TOPIC) { // Max number of questions per topic
+                loadNextQuestion();
+            
+            } else { 
+                console.log("Out of range");
+                appState = 2;    
+                questionsAsked = 0; // Reset
+                changeDivContent(); 
+            }
             
             break;
         case 2: // RESULTS
-            changeDivDisplay("result");   
+            changeDivDisplay("result");  
+            resetHighlight(); 
+            saveScore();
+
             break;
             
         default:
@@ -214,54 +300,77 @@ function changeDivContent () {
     }
 }
 
+// SAVE SCORE
+function saveScore() {
+    if(scores[chosenTopic] < scoreCount) {
+        scores[chosenTopic] = scoreCount;
+    } 
+
+    document.getElementById("final-score").innerHTML = "You Got " + scores[chosenTopic] + "Correct";
+    scoreCount = 0;
+}
+
 // CHECK ANSWER
-// function checkAnswer() {
-    // if correct
-    // scores[chosenTopic]++;
-
-// }
-
+function checkAnswer() {
+    if (chosenAnswer == questions[topicStartingIndex + nextQuestionIndex].answer) {
+        console.log("Correct Answer!");
+        nextQuestionIndex++;
+        scoreCount++;
+        changeDivContent();
+        
+    } else {
+        console.log("Incorrect Answer!");
+        nextQuestionIndex++;
+        changeDivContent();
+    }
+}
 
 // LOAD NEXT QUESTION
-function loadNextQuestion (button) {
-
-    if (questionIndex < NUM_OF_QUESTIONS) {
-        // checkAnswer();
-        loadNextQuestion();
-
-    } else {
-        appState = 2;    
-        questionIndex = 0; // Reset
-        changeDivContent(); 
-    }
-
-    
-    questions.forEach(element => {
-        let topic = button.getAttribute("data-topic");
+function loadNextQuestion () {
+    if (questions[topicStartingIndex + nextQuestionIndex].topic_id == chosenTopic) { // Check if question is the same topic
         
-        if(element.topic_id == topic) {
-            questionIndex++;
-            
-            console.log(questionIndex);
-    
-            if(element.img_src !== null){
-                document.getElementById("question-img-reference").setAttribute("src", element.img_src);
-            }
-            
-            document.getElementById("question-number").innerHTML = questionIndex;
-            document.getElementById("question-text").innerHTML = element.question;
-            
-            let choiceIndex = 1;
-            element.choices.forEach(choice => {
-                console.log("choice-" + choiceIndex + " " + choice);
-                choiceIndex++;
-            });
+        // Removes highlights and prevents going to next question without choosing an answer
+        resetHighlight(); 
+        chosenAnswer = null;
+
+        if(questions[topicStartingIndex + nextQuestionIndex].img_src !== null){ // Check if an image src exists
+            document.getElementById("question-img-reference").setAttribute("src", questions[topicStartingIndex + nextQuestionIndex].img_src);
         } else {
-            console.log("Not the same topic");
-            
             document.getElementById("question-img-reference").setAttribute("src", "");
-            document.getElementById("question-number").innerHTML = "";
-            document.getElementById("question-text").innerHTML = "";
         }
-    });
+        
+        document.getElementById("question-number").innerHTML = (questionsAsked + 1);
+        document.getElementById("question-text").innerHTML = questions[topicStartingIndex + nextQuestionIndex].question;
+        
+        // Populates choices with values
+        let choiceIndex = 1;
+        questions[topicStartingIndex + nextQuestionIndex].choices.forEach(choice => {
+            document.getElementById("choice-" + choiceIndex).innerHTML = choice;
+            console.log("choice-" + choiceIndex + " " + choice);
+            choiceIndex++;
+        });
+        
+        console.log("BEFORE: " + questionsAsked);
+        questionsAsked++;
+        console.log("AFTER: " + questionsAsked);
+
+    } else { // For cases where questions aren't organized in sequence
+        
+        // Find next occurrence of questions for the same topic 
+        console.log("Looking for next occurrence")
+        let nextIndex = questions.findIndex((question, index) => 
+            index >= (topicStartingIndex + nextQuestionIndex) && question.topic_id == chosenTopic
+        );
+        
+        if (nextIndex != -1) { // Update starting index if found/exists
+            topicStartingIndex = nextIndex; 
+            nextQuestionIndex = 0;
+            loadNextQuestion();
+            
+        } else { 
+            console.log("No more questions available for this topic.");
+            appState = 2;
+            changeDivContent();
+        }
+    }
 }

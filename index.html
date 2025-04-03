@@ -11,18 +11,66 @@
 </head>
 <body>
     <h1>QUIZ APPLICATION | G3 WEBDEV</h1>
-    
-    <div class="menu" id="menu">
-        <hr>
+    <hr>
+
+    <div class="menu container" id="menu">
         <h2>Choose A Topic</h2>
-        <button onclick="setChosenTopic(this)" data-topic="PPC" >Philippine Pop Culture</button>
-        <button onclick="setChosenTopic(this)" data-topic="AYATP">Are You A True Pinoy</button>
-        <button onclick="setChosenTopic(this)" data-topic="PMC">Philippine Mythical Creatures</button>
-        <button onclick="setChosenTopic(this)" data-topic="KB">Karunungang Bayan</button>
+        
+        <div class="container text-center">
+            <div class="row">
+              <div class="col">
+                  <div class="card" style="width: 18rem;">
+                      <img src="" class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <h5 class="card-title">Philippine Pop Culture</h5>
+                        <h5 class="score card-title" data-topic="PPC"></h5> 
+                        <p class="card-text">...</p>
+                        <button onclick="setChosenTopic(this)" data-topic="PPC" >START QUIZ</button>
+                      </div>
+                  </div>
+                
+              </div>
+              <div class="col">
+                  <div class="card" style="width: 18rem;">
+                      <img src="" class="card-img-top" alt="...">
+                      <div class="card-body">
+                          <h5 class="card-title">Are You A True Pinoy</h5>
+                          <h5 class="score card-title" data-topic="AYATP"></h5> 
+                          <p class="card-text">...</p>
+                          <button onclick="setChosenTopic(this)" data-topic="AYATP" >START QUIZ</button>
+                      </div>
+                  </div>
+                
+              </div>
+              <div class="col">
+                  <div class="card" style="width: 18rem;">
+                      <img src="" class="card-img-top" alt="...">
+                      <div class="card-body">
+                          <h5 class="card-title text-nowrap">Philippine Mythical Creatures</h5>
+                          <h5 class="score card-title" data-topic="PMC"></h5> 
+                          <p class="card-text">...</p>
+                          <button onclick="setChosenTopic(this)" data-topic="PMC" >START QUIZ</button>
+                      </div>
+                  </div>
+                
+              </div>
+              <div class="col">
+                  <div class="card" style="width: 18rem;">
+                      <img src="" class="card-img-top" alt="...">
+                      <div class="card-body">
+                          <h5 class="card-title">Karunungang Bayan</h5>
+                          <h5 class="score card-title" data-topic="KB"></h5> 
+                          <p class="card-text">...</p>
+                        <button onclick="setChosenTopic(this)" data-topic="KB" >START QUIZ</button>
+                      </div>
+                  </div>
+                
+              </div>
+            </div>
+        </div>
     </div>
 
-    <div class="quiz" id="quiz">
-        <hr>
+    <div class="quiz container" id="quiz" style="display: none;">
         <h2 id="question-number">Question #</h2>
         <p id="question-text">...</p>
         <img id="question-img-reference" class="img-fluid" src="" alt="">
@@ -30,15 +78,20 @@
         <button class="choices" id="choice-2" value="B"></button>
         <button class="choices" id="choice-3" value="C"></button>
         <button class="choices" id="choice-4" value="D"></button>
-        <button onclick="changeDivContent()">Submit</button>
+        <hr>
+        <button onclick="checkAnswer()">Submit</button>
     </div>
 
-    <div class="result" id="result">
-        <hr>
+    <div class="result container" id="result" style="display: none;">
         <h2>Congratulations!</h2>
-        <h3>Your Score is 10/10</h3>
-        <button id="return-home">Return</button>
+        <h3 id="final-score"></h3>
+        <button id="return-menu">Return</button>
         <button id="restart">Restart</button>
+        
+        <hr>
+        <h2>Correct Answers</h2>
+
+
     </div>
 
     <script src="script.js"></script>
