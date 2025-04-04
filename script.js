@@ -1,29 +1,36 @@
+//TODO Next Submit
+//TODO Back button 
+//TODO Confirmation before submitting 
+//TODO Results. Red sa mga wrong answers
+//TODO Implement randomize
+
 const QUESTIONS_PER_TOPIC = 5;
 
-let chosenTopic = null;
-let chosenAnswer = null;
+const elements = {
+    menu: document.getElementById("menu"),
+    quiz: document.getElementById("quiz"),
+    result: document.getElementById("result"),
+    
+    questionNumber: document.getElementById("question-number"),
+    questionText: document.getElementById("question-text"),
+    questionImg: document.getElementById("question-img-reference"),
 
-let topicStartingIndex = 0;
-let questionsAsked = 0;
-let nextQuestionIndex = 0;
+    choice1: document.getElementById("choice-1"),
+    choice2: document.getElementById("choice-2"),
+    choice3: document.getElementById("choice-3"),
+    choice4: document.getElementById("choice-4"),
 
-let appState = 0;
-let scoreCount = 0;
+    finalScore: document.getElementById("final-score"),
+    returnMenu: document.getElementById("return-menu"),
+    restart: document.getElementById("restart"),
+};
 
-let scores = {
+const scores = {
     PPC: 0,
     AYATP: 0,
     PMC: 0,
     KB: 0
 };
-
-//! Next Submit
-//! Back button 
-//! Confirmation before submitting 
-//! Results. Red sa mga wrong answers
-//! Implement randomize
-
-
 
 const questions = [
     // Philippine Pop Culture
@@ -180,6 +187,15 @@ const questions = [
     }
 ]
 
+let chosenTopic = null;
+let chosenAnswer = null;
+
+let topicStartingIndex = 0;
+let questionsAsked = 0;
+let nextQuestionIndex = 0;
+
+let appState = 0;
+let scoreCount = 0;
 
 document.addEventListener("DOMContentLoaded", updateScores);
 
@@ -258,9 +274,9 @@ function setChosenTopic (button) {
 
 // CHANGE DIV DISPLAY
 function changeDivDisplay (state) {
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("quiz").style.display = "none";
-    document.getElementById("result").style.display = "none";
+    elements.menu.style.display = "none";
+    elements.quiz.style.display = "none";
+    elements.result.style.display = "none";
 
     document.getElementById(state).style.display = "block";
 }
@@ -306,7 +322,7 @@ function saveScore() {
         scores[chosenTopic] = scoreCount;
     } 
 
-    document.getElementById("final-score").innerHTML = "You Got " + scores[chosenTopic] + "Correct";
+    elements.finalScore.innerHTML = "You Got " + scores[chosenTopic] + "Correct";
     scoreCount = 0;
 }
 
@@ -334,21 +350,19 @@ function loadNextQuestion () {
         chosenAnswer = null;
 
         if(questions[topicStartingIndex + nextQuestionIndex].img_src !== null){ // Check if an image src exists
-            document.getElementById("question-img-reference").setAttribute("src", questions[topicStartingIndex + nextQuestionIndex].img_src);
+            elements.questionImg.setAttribute("src", questions[topicStartingIndex + nextQuestionIndex].img_src);
         } else {
-            document.getElementById("question-img-reference").setAttribute("src", "");
+            elements.questionImg.setAttribute("src", "");
         }
         
-        document.getElementById("question-number").innerHTML = (questionsAsked + 1);
-        document.getElementById("question-text").innerHTML = questions[topicStartingIndex + nextQuestionIndex].question;
+        elements.questionNumber.innerHTML = (questionsAsked + 1);
+        elements.questionText.innerHTML = questions[topicStartingIndex + nextQuestionIndex].question;
         
         // Populates choices with values
-        let choiceIndex = 1;
-        questions[topicStartingIndex + nextQuestionIndex].choices.forEach(choice => {
-            document.getElementById("choice-" + choiceIndex).innerHTML = choice;
-            console.log("choice-" + choiceIndex + " " + choice);
-            choiceIndex++;
-        });
+        elements.choice1.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[0];
+        elements.choice2.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[1];
+        elements.choice3.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[2];
+        elements.choice4.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[3];
         
         console.log("BEFORE: " + questionsAsked);
         questionsAsked++;
