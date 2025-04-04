@@ -215,48 +215,48 @@ function resetHighlight() {
     });
 }
 
-// CUSTOM SELECTOR FOR MULTIPLE CHOICE QUESTION
-document.querySelectorAll(".choices").forEach( button => {
-    button.addEventListener("click", () => {
-        chosenAnswer = button.getAttribute("value").toString();
-        
+// EVENT LISTENERS FOR DIFFERENT FUNCTIONALITIES
+document.addEventListener("click", (event) => {
+    
+    // CUSTOM SELECTOR FOR MULTIPLE CHOICE QUESTION
+    if (event.target.matches(".choices")) {
+        chosenAnswer = event.target.getAttribute("value").toString();
         resetHighlight();
-
-        button.style.backgroundColor = "green";
+        event.target.style.backgroundColor = "green";
         console.log(chosenAnswer);
-    });
-});
-
-// RESTART QUIZ FOR CURRENT TOPIC 
-document.getElementById("restart").addEventListener("click", () => {
-    appState = 1; // go to quiz state
-    questionsAsked = 0;
-    nextQuestionIndex = 0;
-    topicStartingIndex = 0;
+    } 
     
-    //? Set score na rin ba dito or reset to 0 lang
-    // setScore();
-
-    changeDivContent();
-});
-
-// RETURN TO MENU
-document.getElementById("return-menu").addEventListener("click", () => {
-    appState = 0; // go to menu state
-
-    questionsAsked = 0;
-    nextQuestionIndex = 0;
-    topicStartingIndex = 0;
+    // RESTART QUIZ FOR CURRENT TOPIC 
+    if (event.target === elements.restart) {
+        appState = 1; // go to quiz state
+        questionsAsked = 0;
+        nextQuestionIndex = 0;
+        topicStartingIndex = 0;
+        
+        //? Set score na rin ba dito or reset to 0 lang
+        // setScore();
     
-    //? Set score na rin ba dito or reset to 0 lang
-    // setScore();
+        changeDivContent();
+    }
 
-    updateScores();
+    // RETURN TO MENU
+    if (event.target === elements.returnMenu) {
+        appState = 0; // go to menu state
 
-    console.log(scores);
-
-    scoreCount = 0;
-    changeDivContent();
+        questionsAsked = 0;
+        nextQuestionIndex = 0;
+        topicStartingIndex = 0;
+        
+        //? Set score na rin ba dito or reset to 0 lang
+        // setScore();
+    
+        updateScores();
+    
+        console.log(scores);
+    
+        scoreCount = 0;
+        changeDivContent();
+    }
 });
 
 // CHOSEN TOPIC
