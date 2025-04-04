@@ -4,7 +4,7 @@
 //TODO Results. Red sa mga wrong answers
 //TODO Implement randomize
 
-const QUESTIONS_PER_TOPIC = 5;
+const MAX_QUESTIONS = 5;
 
 const elements = {
     menu: document.getElementById("menu"),
@@ -187,10 +187,11 @@ const questions = [
     }
 ]
 
+let currentQuestionList = [];
+
 let chosenTopic = null;
 let chosenAnswer = null;
 
-let topicStartingIndex = 0;
 let questionsAsked = 0;
 let nextQuestionIndex = 0;
 
@@ -204,7 +205,7 @@ function updateScores() {
     document.querySelectorAll(".score").forEach( score => {
         let topic = score.getAttribute("data-topic");
         console.log(topic);
-        score.innerHTML = scores[topic] + "/" + QUESTIONS_PER_TOPIC;
+        score.innerHTML = scores[topic] + "/" + MAX_QUESTIONS;
     });
 }
 
@@ -215,7 +216,7 @@ function resetHighlight() {
     });
 }
 
-// EVENT LISTENERS FOR DIFFERENT FUNCTIONALITIES
+// EVENT HANDLING USING EVENT DELEGATION
 document.addEventListener("click", (event) => {
     
     // CUSTOM SELECTOR FOR MULTIPLE CHOICE QUESTION
@@ -259,19 +260,6 @@ document.addEventListener("click", (event) => {
     }
 });
 
-// CHOSEN TOPIC
-function setChosenTopic (button) {
-    chosenTopic = button.getAttribute("data-topic");
-    console.log(chosenTopic);
-    
-    // Returns index for the first occurrence of the topic id
-    topicStartingIndex = questions.findIndex(question => question.topic_id == chosenTopic);
-    console.log(topicStartingIndex);
-    
-    appState = 1; // go to quiz state
-    changeDivContent();
-}
-
 // CHANGE DIV DISPLAY
 function changeDivDisplay (state) {
     elements.menu.style.display = "none";
@@ -292,7 +280,7 @@ function changeDivContent () {
         case 1: // QUIZ/QUESTIONS
             changeDivDisplay("quiz");   
 
-            if (questionsAsked < QUESTIONS_PER_TOPIC) { // Max number of questions per topic
+            if (questionsAsked < MAX_QUESTIONS) { // Max number of questions per topic
                 loadNextQuestion();
             
             } else { 
@@ -341,50 +329,57 @@ function checkAnswer() {
     }
 }
 
+
+// CHOSEN TOPIC
+function setChosenTopic (button) {
+    chosenTopic = button.getAttribute("data-topic");
+
+    // Get new list for the chosen topic
+    currentQuestionList = questions.filter( question => question.topic_id === chosenTopic );
+
+    console.log(chosenTopic);
+    console.log(currentQuestionList);
+
+    // Reset values
+    questionsAsked = 0;
+    nextQuestionIndex = 0;
+    
+    appState = 1; // go to quiz state
+    changeDivContent();
+}
+
 // LOAD NEXT QUESTION
 function loadNextQuestion () {
-    if (questions[topicStartingIndex + nextQuestionIndex].topic_id == chosenTopic) { // Check if question is the same topic
-        
-        // Removes highlights and prevents going to next question without choosing an answer
+    
+    // Assign object for readability
+    let currentQuestion = currentQuestionList[nextQuestionIndex];
+
+    if (currentQuestion) {
+        questionsAsked++;
+
+        // Reset choices
         resetHighlight(); 
         chosenAnswer = null;
 
-        if(questions[topicStartingIndex + nextQuestionIndex].img_src !== null){ // Check if an image src exists
-            elements.questionImg.setAttribute("src", questions[topicStartingIndex + nextQuestionIndex].img_src);
+        if(currentQuestion.img_src){ // Check if an image src exists
+            elements.questionImg.setAttribute("src", currentQuestion.img_src);
         } else {
             elements.questionImg.setAttribute("src", "");
         }
-        
-        elements.questionNumber.innerHTML = (questionsAsked + 1);
-        elements.questionText.innerHTML = questions[topicStartingIndex + nextQuestionIndex].question;
-        
-        // Populates choices with values
-        elements.choice1.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[0];
-        elements.choice2.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[1];
-        elements.choice3.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[2];
-        elements.choice4.textContent = questions[topicStartingIndex + nextQuestionIndex].choices[3];
-        
-        console.log("BEFORE: " + questionsAsked);
-        questionsAsked++;
-        console.log("AFTER: " + questionsAsked);
 
-    } else { // For cases where questions aren't organized in sequence
-        
-        // Find next occurrence of questions for the same topic 
-        console.log("Looking for next occurrence")
-        let nextIndex = questions.findIndex((question, index) => 
-            index >= (topicStartingIndex + nextQuestionIndex) && question.topic_id == chosenTopic
-        );
-        
-        if (nextIndex != -1) { // Update starting index if found/exists
-            topicStartingIndex = nextIndex; 
-            nextQuestionIndex = 0;
-            loadNextQuestion();
-            
-        } else { 
-            console.log("No more questions available for this topic.");
-            appState = 2;
-            changeDivContent();
-        }
+        elements.questionNumber.textContent = questionsAsked;
+        elements.questionText.textContent = currentQuestion.question ;
+
+        // Populate buttons with choice content
+        elements.choice1.textContent = currentQuestion.choices[0];
+        elements.choice2.textContent = currentQuestion.choices[1];
+        elements.choice3.textContent = currentQuestion.choices[2];
+        elements.choice4.textContent = currentQuestion.choices[3];
+
+    } else { // For cases where the MAX_QUESTIONS is higher than total questions available
+
+        console.log("No more questions available for this topic.");
+        appState = 2; // go to result state
+        changeDivContent();
     }
 }
