@@ -236,26 +236,21 @@ document.addEventListener("click", (event) => {
     // RESTART QUIZ FOR CURRENT TOPIC 
     if (event.target === elements.restart) {
         appState = 1; // go to quiz state
+
+        // Reset values
+        elements.nextButton.textContent = "Next";
         questionsAsked = 0;
         nextQuestionIndex = 0;
-        topicStartingIndex = 0;
+        scoreCount = 0;
         
-        //? Set score na rin ba dito or reset to 0 lang
-        // setScore();
-    
+        //? save score na rin ba dito or reset to 0 lang
+
         changeDivContent();
     }
 
     // RETURN TO MENU
     if (event.target === elements.returnMenu) {
         appState = 0; // go to menu state
-
-        questionsAsked = 0;
-        nextQuestionIndex = 0;
-        topicStartingIndex = 0;
-        
-        //? Set score na rin ba dito or reset to 0 lang
-        // setScore();
     
         updateScores();
     
@@ -316,12 +311,13 @@ function changeDivContent () {
 
 // SAVE SCORE
 function saveScore() {
-    if(scores[chosenTopic] < scoreCount) {
+    // Display current score
+    elements.finalScore.textContent = `You Scored ${scoreCount} / ${currentQuestionList.length}`;
+
+    // Maintain highest score
+    if(scoreCount > scores[chosenTopic]) {
         scores[chosenTopic] = scoreCount;
     } 
-
-    elements.finalScore.innerHTML = "Your Score Is " + scores[chosenTopic];
-    scoreCount = 0;
 }
 
 // LOAD QUESTION -> CHECK ANSWER -> QUIZ STATE -> LOAD QUESTION
@@ -371,6 +367,7 @@ function setChosenTopic (button) {
     // Reset values
     questionsAsked = 0;
     nextQuestionIndex = 0;
+    scoreCount = 0;
     
     appState = 1; // go to quiz state
     changeDivContent();
