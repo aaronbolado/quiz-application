@@ -334,7 +334,6 @@ function changeDivContent () {
             changeDivDisplay("result"); 
             displayCorrectAnswers();
             saveScore(); 
-
             break;
             
         default:
@@ -386,13 +385,17 @@ function prevQuestion() {
     
     // Go back once to previous index
     nextQuestionIndex--;
-    scoreCount--;
+    
+    // Assign previous question as current question
+    currentQuestion = currentQuestionList[nextQuestionIndex];
+
+    // Only take from score if previous answer was correct
+    if (currentQuestion.user_choice === currentQuestion.answer) {
+        scoreCount--;
+    }
     
     // Needs to go back twice since variable increments each display
     questionsAsked -= 2; 
-
-    // Assign previous question as current question
-    currentQuestion = currentQuestionList[nextQuestionIndex];
     
     changeDivContent();
 }
