@@ -1,8 +1,11 @@
-//TODO Next Submit
+//DONE Next Submit
 //TODO Back button 
-//TODO Confirmation before submitting 
+//DONE Confirmation before submitting 
 //TODO Results. Red sa mga wrong answers
 //TODO Implement randomize
+//TODO Optimize AppState flow
+//TODO Score count
+//? Remove console logs?
 
 const MAX_QUESTIONS = 5;
 
@@ -19,6 +22,8 @@ const elements = {
     choice2: document.getElementById("choice-2"),
     choice3: document.getElementById("choice-3"),
     choice4: document.getElementById("choice-4"),
+    
+    nextButton: document.getElementById("next-button"),
 
     finalScore: document.getElementById("final-score"),
     returnMenu: document.getElementById("return-menu"),
@@ -192,6 +197,7 @@ let currentQuestionList = [];
 let chosenTopic = null;
 let chosenAnswer = null;
 
+let currentQuestion = null;
 let questionsAsked = 0;
 let nextQuestionIndex = 0;
 
@@ -282,6 +288,10 @@ function changeDivContent () {
 
             if (questionsAsked < MAX_QUESTIONS) { // Max number of questions per topic
                 loadNextQuestion();
+                console.log(questionsAsked);
+                if ((questionsAsked) === MAX_QUESTIONS) {
+                    elements.nextButton.textContent = "Submit";
+                }
             
             } else { 
                 console.log("Out of range");
@@ -292,9 +302,9 @@ function changeDivContent () {
             
             break;
         case 2: // RESULTS
-            changeDivDisplay("result");  
-            resetHighlight(); 
-            saveScore();
+            changeDivDisplay("result"); 
+            resetHighlight();
+            saveScore(); 
 
             break;
             
@@ -310,23 +320,41 @@ function saveScore() {
         scores[chosenTopic] = scoreCount;
     } 
 
-    elements.finalScore.innerHTML = "You Got " + scores[chosenTopic] + "Correct";
+    elements.finalScore.innerHTML = "Your Score Is " + scores[chosenTopic];
     scoreCount = 0;
 }
 
-// CHECK ANSWER
-function checkAnswer() {
-    if (chosenAnswer == questions[topicStartingIndex + nextQuestionIndex].answer) {
+// LOAD QUESTION -> CHECK ANSWER -> QUIZ STATE -> LOAD QUESTION
+function checkAnswer() {    
+
+    // For submitting answers
+    if (questionsAsked === MAX_QUESTIONS) {
+        if (confirm("Are you sure you want to submit?")) { // If yes
+            if (chosenAnswer == currentQuestion.answer) {
+                console.log("Correct Answer!");
+                scoreCount++;
+            } else {
+                console.log("Incorrect Answer!");
+            }
+            
+            changeDivContent(); // Should go to result state
+            
+        } else {
+            console.log("Stay");
+            return;
+        }
+    }
+
+    if (chosenAnswer == currentQuestion.answer) {
         console.log("Correct Answer!");
-        nextQuestionIndex++;
         scoreCount++;
-        changeDivContent();
-        
+    
     } else {
         console.log("Incorrect Answer!");
-        nextQuestionIndex++;
-        changeDivContent();
     }
+
+    nextQuestionIndex++;
+    changeDivContent(); // Should load next question
 }
 
 
@@ -352,7 +380,7 @@ function setChosenTopic (button) {
 function loadNextQuestion () {
     
     // Assign object for readability
-    let currentQuestion = currentQuestionList[nextQuestionIndex];
+    currentQuestion = currentQuestionList[nextQuestionIndex];
 
     if (currentQuestion) {
         questionsAsked++;
