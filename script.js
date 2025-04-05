@@ -236,7 +236,7 @@ function updateScores() {
     document.querySelectorAll(".score").forEach( score => {
         let topic = score.getAttribute("data-topic");
         console.log(topic);
-        score.innerHTML = scores[topic] + "/" + MAX_QUESTIONS;
+        score.textContent = `${scores[topic]} / ${MAX_QUESTIONS}`;
     });
 }
 
