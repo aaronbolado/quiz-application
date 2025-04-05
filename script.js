@@ -1,5 +1,5 @@
 //DONE Next Submit
-//TODO Back button 
+//DONE Back button 
 //DONE Confirmation before submitting 
 //DONE Results. Red sa mga wrong answers
 //TODO Implement randomize
@@ -10,6 +10,7 @@
 //? Remove console logs?
 
 const MAX_QUESTIONS = 5;
+const MENU = 0, QUIZ = 1, RESULTS = 2;
 
 const elements = {
     menu: document.getElementById("menu"),
@@ -25,6 +26,7 @@ const elements = {
     choice3: document.getElementById("choice-3"),
     choice4: document.getElementById("choice-4"),
     
+    backButton: document.getElementById("back-button"),
     nextButton: document.getElementById("next-button"),
 
     finalScore: document.getElementById("final-score"),
@@ -286,7 +288,7 @@ document.addEventListener("click", (event) => {
 });
 
 // CHANGE DIV DISPLAY
-function changeDivDisplay (state) {
+function changeDivDisplay (state) { 
     elements.menu.style.display = "none";
     elements.quiz.style.display = "none";
     elements.result.style.display = "none";
@@ -294,36 +296,42 @@ function changeDivDisplay (state) {
     document.getElementById(state).style.display = "block";
 }
 
+// HANDLING QUIZ STATE
+function handleQuizState(){
+    if (questionsAsked < MAX_QUESTIONS) { // Max number of questions per topic
+        loadNextQuestion();
+        
+        // Hide back button if at first question
+        elements.backButton.style.display = (questionsAsked === 1)? "none" : "block";
+        
+        // Change text to submit if at last question
+        elements.nextButton.textContent = (questionsAsked === MAX_QUESTIONS || questionsAsked === currentQuestionList.length)? "Submit" : "Next";        
+        console.log(questionsAsked);
+
+    } else { 
+        console.log("Out of range");
+        appState = 2;    
+        questionsAsked = 0; // Reset
+        changeDivContent(); // Go to results
+    }
+}
+
 // CHANGE DIV CONTENT (states)
 function changeDivContent () {
 
     switch (appState) {
-        case 0: // MENU/HOME
+        case MENU: // MENU/HOME
             changeDivDisplay("menu");
         break;
         
-        case 1: // QUIZ/QUESTIONS
+        case QUIZ: // QUIZ/QUESTIONS
             changeDivDisplay("quiz");   
-
-            if (questionsAsked < MAX_QUESTIONS) { // Max number of questions per topic
-                loadNextQuestion();
-                console.log(questionsAsked);
-                if ((questionsAsked) === MAX_QUESTIONS) {
-                    elements.nextButton.textContent = "Submit";
-                }
-            
-            } else { 
-                console.log("Out of range");
-                appState = 2;    
-                questionsAsked = 0; // Reset
-                changeDivContent(); 
-            }
-            
+            handleQuizState();
             break;
-        case 2: // RESULTS
+
+        case RESULTS: // RESULTS
             changeDivDisplay("result"); 
             displayCorrectAnswers();
-            resetHighlight();
             saveScore(); 
 
             break;
@@ -346,7 +354,7 @@ function displayCorrectAnswers() {
         // For changing background-color
         let isCorrect = element["answer"] === element["user_choice"]; 
 
-        // ADD CLASSES AND CHANGE STYLES
+        // ADD CLASSES AND CHANGE STYLES FOR FRONTEND
         correctAnswerComponent.innerHTML = `
         <div class="" style="background-color: ${isCorrect? "green" : "red"}">
             <h2 class="">${currentQuestionList.indexOf(element) + 1}</h2>
@@ -370,6 +378,22 @@ function saveScore() {
     if(scoreCount > scores[chosenTopic]) {
         scores[chosenTopic] = scoreCount;
     } 
+}
+
+// LOAD PREVIOUS QUESTION
+function prevQuestion() {
+    
+    // Go back once to previous index
+    nextQuestionIndex--;
+    scoreCount--;
+    
+    // Needs to go back twice since variable increments each display
+    questionsAsked -= 2; 
+
+    // Assign previous question as current question
+    currentQuestion = currentQuestionList[nextQuestionIndex];
+    
+    changeDivContent();
 }
 
 // LOAD QUESTION -> CHECK ANSWER -> QUIZ STATE -> LOAD QUESTION
