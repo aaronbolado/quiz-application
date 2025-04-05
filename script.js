@@ -5,6 +5,8 @@
 //TODO Implement randomize
 //TODO Optimize AppState flow
 //TODO Score count
+//TODO Fix checkAnswer increasing score. Submitting without choice.
+//TODO Add user_choice in questions objects for tracking 
 //? Remove console logs?
 
 const MAX_QUESTIONS = 5;
@@ -28,6 +30,8 @@ const elements = {
     finalScore: document.getElementById("final-score"),
     returnMenu: document.getElementById("return-menu"),
     restart: document.getElementById("restart"),
+
+    correctAnswersDiv: document.getElementById("correct-answers")
 };
 
 const scores = {
@@ -298,6 +302,7 @@ function changeDivContent () {
             break;
         case 2: // RESULTS
             changeDivDisplay("result"); 
+            displayCorrectAnswers();
             resetHighlight();
             saveScore(); 
 
@@ -307,6 +312,27 @@ function changeDivContent () {
             console.log("Error");
             break;
     }
+}
+
+// GENERATE CUSTOM TAGS FOR CORRECT ANSWERS
+function displayCorrectAnswers() {
+    elements.correctAnswersDiv.innerHTML = " ";
+    
+    currentQuestionList.forEach( element => {        // Create custom components
+        let correctAnswerComponent = document.createElement('custom');
+        
+        correctAnswerComponent.innerHTML = `
+        <div class="" style="">
+            <h2 class="">${currentQuestionList.indexOf(element) + 1}</h2>
+            <p class="">${element["question"]}</p>
+            <img class="img-fluid" src="${element["img_src"]? element["img_src"]: ""}" alt="">
+            <p class="">${element["answer"]}</p>
+            <p class="">User Choice</p>
+        </div>
+        `;
+        
+        elements.correctAnswersDiv.appendChild(correctAnswerComponent);
+    });
 }
 
 // SAVE SCORE
@@ -334,11 +360,12 @@ function checkAnswer() {
             }
             
             changeDivContent(); // Should go to result state
-            
+
         } else {
             console.log("Stay");
             return;
         }
+        
     }
 
     if (chosenAnswer == currentQuestion.answer) {
