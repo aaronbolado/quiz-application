@@ -5,7 +5,7 @@
 //TODO Implement randomize
 //TODO Optimize AppState flow
 //TODO Score count
-//TODO Fix checkAnswer increasing score. Submitting without choice.
+//DONE Fix checkAnswer increasing score. Submitting without choice.
 //TODO Add user_choice in questions objects for tracking 
 //? Remove console logs?
 
@@ -349,10 +349,15 @@ function saveScore() {
 // LOAD QUESTION -> CHECK ANSWER -> QUIZ STATE -> LOAD QUESTION
 function checkAnswer() {    
 
+    if (!chosenAnswer) {
+        alert("ERROR: Please Choose An Answer");
+        return;
+    }
+
     // For submitting answers
     if (questionsAsked === MAX_QUESTIONS) {
         if (confirm("Are you sure you want to submit?")) { // If yes
-            if (chosenAnswer == currentQuestion.answer) {
+            if (chosenAnswer === currentQuestion.answer) {
                 console.log("Correct Answer!");
                 scoreCount++;
             } else {
@@ -360,15 +365,15 @@ function checkAnswer() {
             }
             
             changeDivContent(); // Should go to result state
+            return;
 
         } else {
             console.log("Stay");
             return;
         }
-        
     }
 
-    if (chosenAnswer == currentQuestion.answer) {
+    if (chosenAnswer === currentQuestion.answer) {
         console.log("Correct Answer!");
         scoreCount++;
     
