@@ -2,9 +2,8 @@
 //DONE Back button 
 //DONE Confirmation before submitting 
 //DONE Results. Red sa mga wrong answers
-//TODO Implement randomize
+//DONE Implement randomize
 //TODO Optimize AppState flow
-//TODO Score count
 //DONE Fix checkAnswer increasing score. Submitting without choice.
 //DONE Add user_choice in questions objects for tracking 
 //? Remove console logs?
@@ -269,6 +268,8 @@ document.addEventListener("click", (event) => {
         nextQuestionIndex = 0;
         scoreCount = 0;
         
+        shuffle(currentQuestionList);
+        
         //? save score na rin ba dito or reset to 0 lang
 
         changeDivContent();
@@ -437,6 +438,23 @@ function checkAnswer() {
     changeDivContent(); // Should load next question
 }
 
+// RANDOMIZE QUESTIONS
+function shuffle(arr) {
+    let currentIndex = arr.length;
+  
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+  
+      // Pick a remaining element...
+      let randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [arr[currentIndex], arr[randomIndex]] = [
+        arr[randomIndex], arr[currentIndex]];
+    }
+}
+
 
 // CHOSEN TOPIC
 function setChosenTopic (button) {
@@ -444,6 +462,8 @@ function setChosenTopic (button) {
 
     // Get new list for the chosen topic
     currentQuestionList = questions.filter( question => question.topic_id === chosenTopic );
+
+    shuffle(currentQuestionList);
 
     console.log(chosenTopic);
     console.log(currentQuestionList);
