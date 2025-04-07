@@ -229,10 +229,10 @@ let nextQuestionIndex = 0;
 let appState = 0;
 let scoreCount = 0;
 
-document.addEventListener("DOMContentLoaded", updateScores);
+document.addEventListener("DOMContentLoaded", displayMenuScores);
 
 // DISPLAY SCORE ON MENU
-function updateScores() {
+function displayMenuScores() {
     document.querySelectorAll(".score").forEach( score => {
         let topic = score.getAttribute("data-topic");
         console.log(topic);
@@ -279,7 +279,7 @@ document.addEventListener("click", (event) => {
     if (event.target === elements.returnMenu) {
         appState = 0; // go to menu state
     
-        updateScores();
+        displayMenuScores();
     
         console.log(scores);
     
@@ -359,9 +359,9 @@ function displayCorrectAnswers() {
         <div class="" style="background-color: ${isCorrect? "green" : "red"}">
             <h2 class="">${currentQuestionList.indexOf(element) + 1}</h2>
             <p class="">${element["question"]}</p>
-            <img class="img-fluid" src="${element["img_src"]? element["img_src"]: ""}" alt="">
-            <p class="">${element["answer"]}</p>
-            <p class="">${element["user_choice"]}</p>
+            <img class="img-fluid" src="${element["img_src"]? element["img_src"] : "" }" alt="">
+            <div class=""><h5>Correct Answer:</h5> ${element["choices"][element["answer"].charCodeAt(0) - 65]}</div>
+            <div class=""><h5>Your Answer:</h5> ${element["choices"][element["user_choice"].charCodeAt(0) - 65]}</div>
         </div>
         `;
         
