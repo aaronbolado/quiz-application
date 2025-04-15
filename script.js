@@ -3,10 +3,10 @@
 //DONE Confirmation before submitting 
 //DONE Results. Red sa mga wrong answers
 //DONE Implement randomize
-//TODO Optimize AppState flow
+//? Optimize AppState flow
 //DONE Fix checkAnswer increasing score. Submitting without choice.
 //DONE Add user_choice in questions objects for tracking 
-//TODO Fix back and next button. questions with answers should maintain the answers unless changed.
+//DONE Fix back and next button. questions with answers should maintain the answers unless changed.
 //? Remove console logs?
 
 const MAX_QUESTIONS = 5;
@@ -257,6 +257,7 @@ document.addEventListener("click", (event) => {
         chosenAnswer = event.target.getAttribute("value").toString();
         resetHighlight();
         event.target.style.backgroundColor = "green";
+        currentQuestion.user_choice = chosenAnswer; // Save user's answer
         console.log(chosenAnswer);
     } 
     
@@ -273,7 +274,7 @@ document.addEventListener("click", (event) => {
         currentQuestionList.forEach( question => {
             question.user_choice = null;
         });
-        
+
         shuffle(currentQuestionList);
         
         //? save score na rin ba dito or reset to 0 lang
@@ -285,6 +286,10 @@ document.addEventListener("click", (event) => {
     if (event.target === elements.returnMenu) {
         appState = 0; // go to menu state
     
+        currentQuestionList.forEach( question => {
+            question.user_choice = null;
+        });
+
         displayMenuScores();
     
         console.log(scores);
@@ -423,7 +428,6 @@ function checkAnswer() {
                 console.log("Incorrect Answer!");
             }
             
-            currentQuestion.user_choice = chosenAnswer; // Save user's answer
             changeDivContent(); // Should go to result state
             return;
 
@@ -441,7 +445,6 @@ function checkAnswer() {
         console.log("Incorrect Answer!");
     }
     
-    currentQuestion.user_choice = chosenAnswer; // Save user's answer
     nextQuestionIndex++;
     changeDivContent(); // Should load next question
 }
