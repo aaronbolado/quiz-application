@@ -6,6 +6,7 @@
 //TODO Optimize AppState flow
 //DONE Fix checkAnswer increasing score. Submitting without choice.
 //DONE Add user_choice in questions objects for tracking 
+//TODO Fix back and next button. questions with answers should maintain the answers unless changed.
 //? Remove console logs?
 
 const MAX_QUESTIONS = 5;
@@ -218,6 +219,7 @@ const questions = [
 ]
 
 let currentQuestionList = [];
+let currentAnswerList = [];
 
 let chosenTopic = null;
 let chosenAnswer = null;
@@ -267,6 +269,10 @@ document.addEventListener("click", (event) => {
         questionsAsked = 0;
         nextQuestionIndex = 0;
         scoreCount = 0;
+        
+        currentQuestionList.forEach( question => {
+            question.user_choice = null;
+        });
         
         shuffle(currentQuestionList);
         
@@ -396,7 +402,6 @@ function prevQuestion() {
     
     // Needs to go back twice since variable increments each display
     questionsAsked -= 2; 
-    
     changeDivContent();
 }
 
@@ -458,7 +463,6 @@ function shuffle(arr) {
     }
 }
 
-
 // CHOSEN TOPIC
 function setChosenTopic (button) {
     chosenTopic = button.getAttribute("data-topic");
@@ -480,6 +484,27 @@ function setChosenTopic (button) {
     changeDivContent();
 }
 
+function loadChoiceState (user_choice) {
+    console.log(`Object user_choice: ${user_choice}`)
+    if (user_choice) {
+        // Reset choices
+        resetHighlight(); 
+        chosenAnswer = null;
+        
+        console.log(`Object user_choice: ${user_choice}`)
+        chosenAnswer = user_choice;
+
+        let buttonChoice = document.querySelector(`button.choices[value="${user_choice}"]`);
+        console.log(`Button choice: ${buttonChoice.getAttribute("value")}`)
+        buttonChoice.style.backgroundColor = "green";
+
+    } else {
+        // Reset choices
+        resetHighlight(); 
+        chosenAnswer = null;
+    }
+}
+
 // LOAD NEXT QUESTION
 function loadNextQuestion () {
     
@@ -489,9 +514,7 @@ function loadNextQuestion () {
     if (currentQuestion) {
         questionsAsked++;
 
-        // Reset choices
-        resetHighlight(); 
-        chosenAnswer = null;
+        loadChoiceState(currentQuestion["user_choice"]);
 
         if(currentQuestion.img_src){ // Check if an image src exists
             elements.questionImg.setAttribute("src", currentQuestion.img_src);
